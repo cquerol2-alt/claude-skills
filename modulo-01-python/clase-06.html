@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase 06: Clases y OOP — Módulo 1 Python para Devs Web</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <nav class="clase-nav">
+            <span class="breadcrumb">Dashboard > Módulo 1 > Clase 06</span>
+        </nav>
+
+        <!-- Header -->
+        <header class="clase-header">
+            <h1>Clase 06: Clases y Programación Orientada a Objetos</h1>
+            <p class="clase-meta">Semana 2 — Lunes | 🎬 30 min + 💻 50 min + 🧪 15 min</p>
+        </header>
+
+        <!-- Video Section -->
+        <section class="card">
+            <h2 class="section-title">
+                <span class="section-icon">🎬</span> Vídeo
+            </h2>
+            <div class="video-wrapper">
+                <iframe
+                    width="100%"
+                    height="400"
+                    src="https://www.youtube.com/embed/ZDa-Z5JzLYM"
+                    title="CS50P Object-Oriented Programming"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <p class="video-note"><strong>CS50P —</strong> Sección de Object-Oriented Programming</p>
+        </section>
+
+        <!-- Summary Section -->
+        <section class="card">
+            <h2 class="section-title">
+                <span class="section-icon">📖</span> Resumen
+            </h2>
+
+            <h3>¿Qué es la Programación Orientada a Objetos?</h3>
+            <p>La OOP es un paradigma que organiza el código en <strong>objetos</strong> que contienen datos (atributos) y comportamientos (métodos). En Python, los objetos se crean a partir de <strong>clases</strong>.</p>
+
+            <div class="info">
+                <strong>💡 Analogía:</strong> Una clase es como un plano de construcción, y un objeto es la casa construida a partir de ese plano.
+            </div>
+
+            <h3>Sintaxis básica: La palabra clave <code>class</code></h3>
+            <p>Para definir una clase en Python usamos <code>class</code>:</p>
+
+            <div class="code-block">
+<pre><code>class Player:
+    """Una clase que representa un jugador en un videojuego."""
+
+    def __init__(self, name, health=100):
+        """Constructor: se ejecuta cuando creamos un objeto."""
+        self.name = name
+        self.health = health
+
+    def take_damage(self, damage):
+        """Método: reduce la salud del jugador."""
+        self.health -= damage
+        print(f"{self.name} recibió {damage} de daño. Salud: {self.health}")
+
+    def heal(self, amount):
+        """Método: restaura la salud del jugador."""
+        self.health = min(self.health + amount, 100)
+        print(f"{self.name} fue curado. Salud: {self.health}")
+
+    def __str__(self):
+        """Método especial: define cómo se muestra el objeto."""
+        return f"{self.name} (Salud: {self.health})"
+
+# Crear instancias (objetos)
+player1 = Player("Aragorn", 100)
+player2 = Player("Gimli", 95)
+
+print(player1)  # Aragorn (Salud: 100)
+player1.take_damage(30)  # Aragorn recibió 30 de daño. Salud: 70
+player1.heal(20)  # Aragorn fue curado. Salud: 90</code></pre>
+            </div>
+
+            <h3>Conceptos clave</h3>
+
+            <h4><code>self</code> — La referencia a la instancia</h4>
+            <p><code>self</code> representa el objeto actual. Todos los métodos reciben <code>self</code> como primer parámetro para acceder a los atributos del objeto.</p>
+
+            <h4><code>__init__</code> — El constructor</h4>
+            <p>Es el método especial que se ejecuta automáticamente al crear una instancia. Inicializa los atributos.</p>
+
+            <h4>Variables de instancia vs. variables de clase</h4>
+            <p>Las variables de instancia son únicas para cada objeto; las variables de clase se comparten entre todas las instancias:</p>
+
+            <div class="code-block">
+<pre><code>class Product:
+    """Producto de e-commerce."""
+    tax_rate = 0.21  # Variable de clase: se comparte
+
+    def __init__(self, name, price):
+        self.name = name  # Variable de instancia: única por objeto
+        self.price = price
+
+product1 = Product("Arroz Bomba", 3.50)
+product2 = Product("Arroz Integral", 4.20)
+
+print(product1.name)  # Arroz Bomba
+print(product1.tax_rate)  # 0.21 (accede a la variable de clase)
+
+# Cambiar variable de clase (afecta a todas las instancias)
+Product.tax_rate = 0.23</code></pre>
+            </div>
+
+            <h4><code>__str__</code> — Representación del objeto</h4>
+            <p>Este método especial define cómo se muestra el objeto cuando lo imprimes o lo conviertes a string.</p>
+
+            <h4>Herencia — Extender clases</h4>
+            <p>Permite crear nuevas clases basadas en clases existentes, reutilizando código:</p>
+
+            <div class="code-block">
+<pre><code>class Character:
+    """Clase base."""
+    def __init__(self, name, health):
+        self.name = name
+        self.health = health
+
+    def introduce(self):
+        return f"Soy {self.name}"
+
+class Warrior(Character):
+    """Clase derivada que hereda de Character."""
+    def __init__(self, name, health, weapon):
+        super().__init__(name, health)  # Llama al constructor de la clase padre
+        self.weapon = weapon
+
+    def attack(self):
+        return f"{self.name} ataca con {self.weapon}!"
+
+class Mage(Character):
+    """Otra clase derivada."""
+    def __init__(self, name, health, mana):
+        super().__init__(name, health)
+        self.mana = mana
+
+    def cast_spell(self):
+        if self.mana >= 20:
+            self.mana -= 20
+            return f"{self.name} lanza un hechizo!"
+        return f"{self.name} no tiene maná suficiente."
+
+warrior = Warrior("Conan", 150, "espada")
+mage = Mage("Merlin", 80, 100)
+
+print(warrior.introduce())  # Soy Conan
+print(warrior.attack())  # Conan ataca con espada!
+print(mage.cast_spell())  # Merlin lanza un hechizo!</code></pre>
+            </div>
+
+            <h4><code>super()</code> — Acceder a la clase padre</h4>
+            <p><code>super()</code> permite llamar a métodos de la clase padre desde una clase derivada.</p>
+
+            <h4><code>@property</code> — Propiedades (getters)</h4>
+            <p>El decorador <code>@property</code> permite acceder a métodos como si fueran atributos:</p>
+
+            <div class="code-block">
+<pre><code>class Temperature:
+    def __init__(self, celsius):
+        self._celsius = celsius
+
+    @property
+    def fahrenheit(self):
+        """Calcula Fahrenheit a partir de Celsius."""
+        return (self._celsius * 9/5) + 32
+
+    @property
+    def celsius(self):
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value):
+        self._celsius = value
+
+temp = Temperature(25)
+print(temp.celsius)  # 25
+print(temp.fahrenheit)  # 77.0
+temp.celsius = 30
+print(temp.fahrenheit)  # 86.0</code></pre>
+            </div>
+
+            <h3>Python vs JavaScript: Clases</h3>
+            <p>La sintaxis es muy similar, pero Python es más minimalista:</p>
+
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="background-color: #1B5E20; color: white;">
+                    <th style="padding: 10px; border: 1px solid #ddd;">Aspecto</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">Python</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">JavaScript</th>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Declaración</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><code>class Player:</code></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><code>class Player {}</code></td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Constructor</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><code>def __init__(self):</code></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><code>constructor() {}</code></td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Métodos</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><code>def method(self):</code></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><code>method() {}</code></td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Herencia</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><code>class Child(Parent):</code></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><code>class Child extends Parent {}</code></td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Super</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><code>super().__init__()</code></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><code>super.constructor()</code></td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Guided Practice Section -->
+        <section class="card">
+            <h2 class="section-title">
+                <span class="section-icon">💻</span> Práctica Guiada
+            </h2>
+
+            <h3>Paso 1: Crear la clase base</h3>
+            <p>Vamos a construir una clase <code>Product</code> para un e-commerce de arroces:</p>
+
+            <div class="code-block">
+<pre><code>class Product:
+    """Representa un producto en la tienda."""
+
+    def __init__(self, name, price, stock):
+        self.name = name
+        self.price = price
+        self.stock = stock
+
+    def __str__(self):
+        return f"{self.name} - {self.price}€ ({self.stock} ud.)"
+
+    def buy(self, quantity):
+        """Compra una cantidad del producto."""
+        if quantity <= self.stock:
+            self.stock -= quantity
+            return f"Compra realizada: {quantity}x {self.name}"
+        return f"No hay suficiente stock. Disponibles: {self.stock}"
+
+    def restock(self, quantity):
+        """Aumenta el stock."""
+        self.stock += quantity
+        return f"Stock actualizado a {self.stock} ud."
+
+# Probar
+rice = Product("Arroz Bomba", 3.50, 50)
+print(rice)  # Arroz Bomba - 3.5€ (50 ud.)
+print(rice.buy(10))  # Compra realizada: 10x Arroz Bomba
+print(rice)  # Arroz Bomba - 3.5€ (40 ud.)
+</code></pre>
+            </div>
+
+            <h3>Paso 2: Extender con herencia</h3>
+            <p>Creamos una clase especializada <code>PremiumProduct</code>:</p>
+
+            <div class="code-block">
+<pre><code>class PremiumProduct(Product):
+    """Producto premium con descuento por volumen."""
+
+    def __init__(self, name, price, stock, discount_threshold=5):
+        super().__init__(name, price, stock)
+        self.discount_threshold = discount_threshold
+
+    def buy(self, quantity):
+        """Sobrescribe el método de compra con descuento."""
+        if quantity >= self.discount_threshold:
+            discount = 0.15  # 15% de descuento
+            final_price = self.price * (1 - discount)
+            print(f"¡Descuento aplicado! Precio: {final_price}€/ud")
+
+        return super().buy(quantity)
+
+# Probar
+premium = PremiumProduct("Arroz Integral Premium", 5.00, 30, discount_threshold=3)
+print(premium.buy(5))  # ¡Descuento aplicado! Precio: 4.25€/ud
+# Compra realizada: 5x Arroz Integral Premium
+</code></pre>
+            </div>
+
+            <h3>Paso 3: Usar @property</h3>
+            <p>Agregamos una propiedad calculada:</p>
+
+            <div class="code-block">
+<pre><code>class Product:
+    # ... (código anterior)
+
+    @property
+    def total_value(self):
+        """Calcula el valor total del inventario."""
+        return self.price * self.stock
+
+    @property
+    def status(self):
+        """Estado del stock."""
+        if self.stock == 0:
+            return "Agotado"
+        elif self.stock < 10:
+            return "Bajo stock"
+        else:
+            return "Disponible"
+
+rice = Product("Arroz Bomba", 3.50, 15)
+print(rice.total_value)  # 52.5
+print(rice.status)  # Disponible
+</code></pre>
+            </div>
+        </section>
+
+        <!-- Challenge Section -->
+        <section class="card reto-box">
+            <h2 class="section-title">
+                <span class="section-icon">🧪</span> Mini-reto
+            </h2>
+
+            <h3>Sistema simple de carrito de compra</h3>
+            <p><strong>Objetivo:</strong> Crea dos clases: <code>Product</code> y <code>ShoppingCart</code> con el siguiente comportamiento:</p>
+
+            <div class="code-block">
+<pre><code>class Product:
+    """Un producto con nombre, precio y stock."""
+
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+    def __str__(self):
+        return f"{self.name} ({self.price}€)"
+
+
+class ShoppingCart:
+    """Un carrito que almacena productos con cantidad."""
+
+    def __init__(self):
+        self.items = []  # Lista de tuplas (Product, quantity)
+
+    def add_product(self, product, quantity=1):
+        """Añade un producto al carrito."""
+        self.items.append((product, quantity))
+        print(f"Añadido: {quantity}x {product.name}")
+
+    def total_price(self):
+        """Calcula el precio total del carrito."""
+        total = sum(product.price * quantity for product, quantity in self.items)
+        return total
+
+    def item_count(self):
+        """Cuenta el número total de artículos."""
+        return sum(quantity for product, quantity in self.items)
+
+    def show_cart(self):
+        """Muestra el contenido del carrito."""
+        print("=== Carrito ===")
+        for product, quantity in self.items:
+            print(f"  {quantity}x {product}")
+        print(f"Total: {self.total_price()}€")
+
+# Prueba
+rice1 = Product("Arroz Bomba", 3.50)
+rice2 = Product("Arroz Integral", 4.20)
+
+cart = ShoppingCart()
+cart.add_product(rice1, 2)
+cart.add_product(rice2, 1)
+cart.show_cart()
+print(f"Artículos: {cart.item_count()}")</code></pre>
+            </div>
+
+            <div class="tip">
+                <strong>💡 Pista:</strong> Usa una lista para almacenar tuplas (producto, cantidad).
+            </div>
+
+            <p><strong>Desafío bonus:</strong> Añade un método <code>apply_discount(percentage)</code> que reduce el total del carrito.</p>
+        </section>
+
+        <!-- Test Section -->
+        <section class="card">
+            <h2 class="section-title">
+                <span class="section-icon">📝</span> Test de autoevaluación
+            </h2>
+
+            <div class="quiz-container" id="quizContainer">
+                <p>Cargando preguntas...</p>
+            </div>
+
+            <div id="quizResults" style="display: none; margin-top: 20px; padding: 15px; background-color: #e8f5e9; border-left: 4px solid #1B5E20;">
+                <h3>Resultados</h3>
+                <p id="resultText"></p>
+            </div>
+        </section>
+
+        <!-- Navigation -->
+        <nav class="clase-nav" style="margin-top: 40px; display: flex; justify-content: space-between;">
+            <a href="clase-05.html" class="nav-button">← Clase 05</a>
+            <a href="clase-07.html" class="nav-button">Clase 07 →</a>
+        </nav>
+    </div>
+
+    <script src="../js/progress.js"></script>
+    <script>
+        // Initialize quiz with questions
+        const quizData = [
+            {
+                question: "¿Cuál es el propósito del método <code>__init__</code>?",
+                options: [
+                    "Inicializar los atributos de la instancia",
+                    "Destruir el objeto",
+                    "Convertir el objeto a string",
+                    "Definir variables globales"
+                ],
+                correct: 0
+            },
+            {
+                question: "¿Qué representa <code>self</code> en una clase?",
+                options: [
+                    "La clase en sí",
+                    "La instancia actual (el objeto)",
+                    "El módulo principal",
+                    "Una variable global"
+                ],
+                correct: 1
+            },
+            {
+                question: "¿Cuál es la diferencia entre una variable de instancia y una variable de clase?",
+                options: [
+                    "No hay diferencia",
+                    "La variable de instancia es única por objeto; la de clase se comparte entre todas las instancias",
+                    "La variable de clase no puede ser modificada",
+                    "La variable de instancia es global"
+                ],
+                correct: 1
+            },
+            {
+                question: "¿Cómo se define una clase derivada en Python?",
+                options: [
+                    "class Child = Parent",
+                    "class Child(Parent):",
+                    "class Child extends Parent:",
+                    "child = Parent()"
+                ],
+                correct: 1
+            },
+            {
+                question: "¿Qué hace <code>super().__init__()</code> en una clase derivada?",
+                options: [
+                    "Crea un nuevo objeto",
+                    "Llama al constructor de la clase padre",
+                    "Destruye la clase padre",
+                    "Importa módulos externos"
+                ],
+                correct: 1
+            },
+            {
+                question: "¿Cuál es el propósito del método <code>__str__</code>?",
+                options: [
+                    "Crear strings sin formato",
+                    "Definir cómo se muestra el objeto cuando se convierte a string",
+                    "Eliminar strings",
+                    "Comprimir strings"
+                ],
+                correct: 1
+            },
+            {
+                question: "¿Qué es la herencia en OOP?",
+                options: [
+                    "El acceso a atributos privados",
+                    "La capacidad de crear nuevas clases basadas en clases existentes",
+                    "Un tipo de variable",
+                    "Un error de Python"
+                ],
+                correct: 1
+            },
+            {
+                question: "¿Qué indica el decorador <code>@property</code>?",
+                options: [
+                    "Que es un método privado",
+                    "Que es un atributo obligatorio",
+                    "Que permite acceder a un método como si fuera un atributo",
+                    "Que es un variable de clase"
+                ],
+                correct: 2
+            },
+            {
+                question: "¿Cuál es la diferencia entre <code>class Player:</code> y <code>player = Player()</code>?",
+                options: [
+                    "No hay diferencia",
+                    "La primera define la clase; la segunda crea una instancia",
+                    "La primera crea una instancia; la segunda define la clase",
+                    "Ambas son lo mismo"
+                ],
+                correct: 1
+            },
+            {
+                question: "¿Qué pasa si una clase derivada no llama a <code>super().__init__()</code>?",
+                options: [
+                    "Nada, no es necesario",
+                    "Los atributos de la clase padre no se inicializan correctamente",
+                    "La clase padre se elimina",
+                    "El programa se ejecuta más rápido"
+                ],
+                correct: 1
+            }
+        ];
+
+        // Initialize the quiz
+        if (typeof CourseProgress !== 'undefined') {
+            CourseProgress.initQuiz('m1-c06', quizData);
+        }
+    </script>
+</body>
+</html>

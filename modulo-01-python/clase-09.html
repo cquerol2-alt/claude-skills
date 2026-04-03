@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase 09: Flask — Tu Primer Servidor Web en Python</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Dashboard</a>
+        <span class="separator">/</span>
+        <a href="../index.html">Módulo 1</a>
+        <span class="separator">/</span>
+        <span class="current">Clase 09</span>
+    </nav>
+
+    <main class="course-content">
+        <!-- Header -->
+        <header class="class-header">
+            <h1>Clase 09: Flask — Tu Primer Servidor Web en Python</h1>
+            <div class="class-meta">
+                <span class="badge">Semana 2 — Jueves</span>
+                <span class="duration">🎬 30 min + 💻 50 min + 🧪 15 min</span>
+            </div>
+            <div class="class-id">ID: m1-c09</div>
+        </header>
+
+        <!-- Video Section -->
+        <section class="video-section">
+            <h2>🎬 Vídeo: Flask Básico</h2>
+            <div class="video-container">
+                <iframe
+                    width="100%"
+                    height="480"
+                    src="https://www.youtube.com/embed/Z1RJmh_OqeA"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section class="summary-section">
+            <h2>📖 Resumen: Flask Básico</h2>
+
+            <div class="content-block">
+                <h3>¿Qué es Flask?</h3>
+                <p>Flask es un <strong>micro-framework</strong> web ligero y flexible para Python. A diferencia de frameworks grandes como Django, Flask te deja total control sobre cómo estructurar tu aplicación. Es perfecto para APIs, servidores rápidos y proyectos medianos.</p>
+            </div>
+
+            <div class="content-block">
+                <h3>Flask vs Express.js</h3>
+                <p>Ya conoces <strong>Express</strong> en Node.js. Flask funciona de forma muy similar: rutas, middlewares, respuestas JSON. La sintaxis cambia, pero la lógica es prácticamente igual. Flask es a Python lo que Express es a JavaScript.</p>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Concepto</th>
+                        <th>Express.js</th>
+                        <th>Flask</th>
+                    </tr>
+                    <tr>
+                        <td>Crear app</td>
+                        <td><code>const app = express()</code></td>
+                        <td><code>app = Flask(__name__)</code></td>
+                    </tr>
+                    <tr>
+                        <td>Ruta GET</td>
+                        <td><code>app.get('/ruta', handler)</code></td>
+                        <td><code>@app.route('/ruta')</code></td>
+                    </tr>
+                    <tr>
+                        <td>Respuesta JSON</td>
+                        <td><code>res.json({data})</code></td>
+                        <td><code>jsonify({data})</code></td>
+                    </tr>
+                    <tr>
+                        <td>Puerto</td>
+                        <td><code>app.listen(3000)</code></td>
+                        <td><code>app.run(port=5000)</code></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="content-block">
+                <h3>Instalar Flask</h3>
+                <pre><code class="language-bash">pip install flask</code></pre>
+            </div>
+
+            <div class="content-block">
+                <h3>Tu Primera App: "Hola Mundo"</h3>
+                <pre><code class="language-python">from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return 'Hola Mundo'
+
+if __name__ == '__main__':
+    app.run(debug=True)</code></pre>
+                <p><strong>Explicación:</strong></p>
+                <ul>
+                    <li><code>Flask(__name__)</code> — Crea la app. <code>__name__</code> indica dónde está el módulo.</li>
+                    <li><code>@app.route('/')</code> — Define una ruta (decorador).</li>
+                    <li><code>debug=True</code> — Recarga automáticamente en cambios y muestra errores detallados.</li>
+                </ul>
+            </div>
+
+            <div class="content-block">
+                <h3>Rutas con Parámetros</h3>
+                <pre><code class="language-python">@app.route('/usuario/&lt;nombre&gt;')
+def saludar(nombre):
+    return f'Hola, {nombre}'
+
+# URL: /usuario/Juan → "Hola, Juan"</code></pre>
+            </div>
+
+            <div class="content-block">
+                <h3>Métodos HTTP: GET y POST</h3>
+                <pre><code class="language-python">@app.route('/api/mensaje', methods=['GET'])
+def obtener_mensaje():
+    return {'mensaje': 'GET funciona'}
+
+@app.route('/api/crear', methods=['POST'])
+def crear():
+    return {'resultado': 'Dato creado'}, 201</code></pre>
+            </div>
+
+            <div class="content-block">
+                <h3>Acceder a Datos (request object)</h3>
+                <pre><code class="language-python">from flask import request
+
+@app.route('/api/buscar', methods=['GET'])
+def buscar():
+    q = request.args.get('q')  # Query param
+    return {'busca': q}
+
+@app.route('/api/guardar', methods=['POST'])
+def guardar():
+    datos = request.json  # Body JSON
+    return {'recibido': datos}</code></pre>
+            </div>
+
+            <div class="content-block">
+                <h3>Devolver JSON con jsonify()</h3>
+                <pre><code class="language-python">from flask import jsonify
+
+@app.route('/api/usuario/&lt;int:id&gt;')
+def usuario(id):
+    return jsonify({'id': id, 'nombre': 'Juan', 'edad': 25})</code></pre>
+            </div>
+
+            <div class="content-block">
+                <h3>Templates: HTML Dinámico</h3>
+                <p>Usa <code>render_template()</code> para renderizar HTML con variables de Python.</p>
+                <pre><code class="language-python">from flask import render_template
+
+@app.route('/perfil/&lt;nombre&gt;')
+def perfil(nombre):
+    return render_template('perfil.html', nombre=nombre, edad=25)</code></pre>
+                <p>En <code>templates/perfil.html</code>:</p>
+                <pre><code class="language-html">&lt;h1&gt;Perfil de {{ nombre }}&lt;/h1&gt;
+&lt;p&gt;Edad: {{ edad }}&lt;/p&gt;</code></pre>
+            </div>
+
+            <div class="content-block">
+                <h3>Debug Mode</h3>
+                <p><code>debug=True</code> activa:</p>
+                <ul>
+                    <li>Recarga automática (hot reload).</li>
+                    <li>Debugger interactivo en errores.</li>
+                    <li><strong>⚠️ Solo en desarrollo.</strong> En producción, <code>debug=False</code>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Guided Practice Section -->
+        <section class="practice-section">
+            <h2>💻 Práctica Guiada: Construir una App Flask Paso a Paso</h2>
+
+            <div class="practice-step">
+                <h3>Paso 1: Hola Mundo</h3>
+                <p>Crea un archivo <code>app.py</code>:</p>
+                <pre><code class="language-python">from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return 'Hola Mundo'
+
+if __name__ == '__main__':
+    app.run(debug=True)</code></pre>
+                <p>Ejecuta:</p>
+                <pre><code class="language-bash">python app.py</code></pre>
+                <p>Abre en navegador: <code>http://localhost:5000</code></p>
+            </div>
+
+            <div class="practice-step">
+                <h3>Paso 2: Ruta con Parámetros</h3>
+                <pre><code class="language-python">@app.route('/saludo/&lt;nombre&gt;')
+def saludo(nombre):
+    return f'¡Hola, {nombre}! Bienvenido a Flask.'</code></pre>
+                <p>Prueba: <code>http://localhost:5000/saludo/Juan</code></p>
+            </div>
+
+            <div class="practice-step">
+                <h3>Paso 3: Endpoint JSON</h3>
+                <pre><code class="language-python">from flask import jsonify
+
+@app.route('/api/usuario/&lt;nombre&gt;')
+def api_usuario(nombre):
+    return jsonify({
+        'nombre': nombre,
+        'lenguaje': 'Python',
+        'framework': 'Flask'
+    })</code></pre>
+                <p>Prueba: <code>http://localhost:5000/api/usuario/Juan</code> → JSON</p>
+            </div>
+
+            <div class="practice-step">
+                <h3>Paso 4: Manejo de Formularios (POST)</h3>
+                <pre><code class="language-python">from flask import request
+
+@app.route('/api/registrar', methods=['POST'])
+def registrar():
+    datos = request.json
+    nombre = datos.get('nombre')
+    email = datos.get('email')
+
+    return jsonify({
+        'mensaje': f'Registrado: {nombre}',
+        'email': email,
+        'status': 'ok'
+    }), 201</code></pre>
+                <p><strong>Prueba con curl:</strong></p>
+                <pre><code class="language-bash">curl -X POST http://localhost:5000/api/registrar \
+  -H "Content-Type: application/json" \
+  -d '{"nombre": "Juan", "email": "juan@example.com"}'</code></pre>
+            </div>
+        </section>
+
+        <!-- Challenge Section -->
+        <section class="challenge-section">
+            <h2>🧪 Mini-reto: 3 Endpoints Flask</h2>
+            <p>Crea una app Flask con estos 3 endpoints:</p>
+
+            <div class="challenge-item">
+                <h3>1. GET / (Inicio)</h3>
+                <p>Devuelve un HTML o texto simple: "Bienvenido a mi servidor Flask"</p>
+            </div>
+
+            <div class="challenge-item">
+                <h3>2. GET /api/saludo/&lt;nombre&gt;</h3>
+                <p>Devuelve JSON:</p>
+                <pre><code class="language-json">{
+    "mensaje": "Hola, [nombre]",
+    "saludo_completo": "¡Hola, [nombre]! Bienvenido a mi API Flask.",
+    "timestamp": "2026-04-03T10:30:00"
+}</code></pre>
+            </div>
+
+            <div class="challenge-item">
+                <h3>3. GET /api/hora</h3>
+                <p>Devuelve la hora actual en JSON:</p>
+                <pre><code class="language-json">{
+    "hora": "2026-04-03T10:30:45",
+    "timezone": "UTC",
+    "formato": "ISO 8601"
+}</code></pre>
+                <p><strong>Pista:</strong> Usa <code>from datetime import datetime</code></p>
+            </div>
+
+            <div class="challenge-hint">
+                <p><strong>💡 Estructura completa esperada:</strong></p>
+                <pre><code class="language-python">from flask import Flask, jsonify
+from datetime import datetime
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return 'Bienvenido a mi servidor Flask'
+
+@app.route('/api/saludo/&lt;nombre&gt;')
+def saludo(nombre):
+    return jsonify({
+        'mensaje': f'Hola, {nombre}',
+        'saludo_completo': f'¡Hola, {nombre}! Bienvenido a mi API Flask.',
+        'timestamp': datetime.now().isoformat()
+    })
+
+@app.route('/api/hora')
+def hora():
+    return jsonify({
+        'hora': datetime.now().isoformat(),
+        'timezone': 'UTC',
+        'formato': 'ISO 8601'
+    })
+
+if __name__ == '__main__':
+    app.run(debug=True)</code></pre>
+            </div>
+        </section>
+
+        <!-- Test Section -->
+        <section class="test-section">
+            <h2>📝 Test: 10 Preguntas</h2>
+            <form id="quizForm" class="quiz-form">
+                <div class="question">
+                    <p><strong>1.</strong> ¿Qué es Flask?</p>
+                    <label><input type="radio" name="q1" value="a"> Un framework web completo como Django</label>
+                    <label><input type="radio" name="q1" value="b"> Un micro-framework ligero y flexible</label>
+                    <label><input type="radio" name="q1" value="c"> Una librería para análisis de datos</label>
+                    <label><input type="radio" name="q1" value="d"> Un lenguaje de programación</label>
+                </div>
+
+                <div class="question">
+                    <p><strong>2.</strong> ¿Cuál es el comando para crear una app Flask?</p>
+                    <label><input type="radio" name="q2" value="a"> app = Express(__name__)</label>
+                    <label><input type="radio" name="q2" value="b"> app = Flask(__name__)</label>
+                    <label><input type="radio" name="q2" value="c"> app = Framework('Flask')</label>
+                    <label><input type="radio" name="q2" value="d"> app = createApp('flask')</label>
+                </div>
+
+                <div class="question">
+                    <p><strong>3.</strong> ¿Qué decorador define una ruta en Flask?</p>
+                    <label><input type="radio" name="q3" value="a"> @app.endpoint()</label>
+                    <label><input type="radio" name="q3" value="b"> @app.path()</label>
+                    <label><input type="radio" name="q3" value="c"> @app.route()</label>
+                    <label><input type="radio" name="q3" value="d"> @route.app()</label>
+                </div>
+
+                <div class="question">
+                    <p><strong>4.</strong> ¿Cómo devuelves JSON en Flask?</p>
+                    <label><input type="radio" name="q4" value="a"> return JSON.stringify({data})</label>
+                    <label><input type="radio" name="q4" value="b"> return jsonify({data})</label>
+                    <label><input type="radio" name="q4" value="c"> return json.dumps({data})</label>
+                    <label><input type="radio" name="q4" value="d"> return {data}</label>
+                </div>
+
+                <div class="question">
+                    <p><strong>5.</strong> ¿En qué puerto corre Flask por defecto?</p>
+                    <label><input type="radio" name="q5" value="a"> 3000</label>
+                    <label><input type="radio" name="q5" value="b"> 8000</label>
+                    <label><input type="radio" name="q5" value="c"> 5000</label>
+                    <label><input type="radio" name="q5" value="d"> 8080</label>
+                </div>
+
+                <div class="question">
+                    <p><strong>6.</strong> ¿Qué hace <code>debug=True</code> en Flask?</p>
+                    <label><input type="radio" name="q6" value="a"> Desactiva todas las rutas</label>
+                    <label><input type="radio" name="q6" value="b"> Activa recarga automática y debugger interactivo</label>
+                    <label><input type="radio" name="q6" value="c"> Compila la app a C++</label>
+                    <label><input type="radio" name="q6" value="d"> Aumenta la seguridad</label>
+                </div>
+
+                <div class="question">
+                    <p><strong>7.</strong> ¿Cómo accedes a parámetros URL en Flask?</p>
+                    <label><input type="radio" name="q7" value="a"> request.params.get('key')</label>
+                    <label><input type="radio" name="q7" value="b"> request.args.get('key')</label>
+                    <label><input type="radio" name="q7" value="c"> request.query('key')</label>
+                    <label><input type="radio" name="q7" value="d"> request.url.get('key')</label>
+                </div>
+
+                <div class="question">
+                    <p><strong>8.</strong> ¿Cuál es la diferencia entre @app.route('/', methods=['GET']) y methods=['POST']?</p>
+                    <label><input type="radio" name="q8" value="a"> GET obtiene datos, POST envía datos</label>
+                    <label><input type="radio" name="q8" value="b"> No hay diferencia</label>
+                    <label><input type="radio" name="q8" value="c"> POST es más rápido</label>
+                    <label><input type="radio" name="q8" value="d"> GET es para seguridad</label>
+                </div>
+
+                <div class="question">
+                    <p><strong>9.</strong> ¿Cómo renderizas una plantilla HTML en Flask?</p>
+                    <label><input type="radio" name="q9" value="a"> return template('file.html')</label>
+                    <label><input type="radio" name="q9" value="b"> return render_template('file.html')</label>
+                    <label><input type="radio" name="q9" value="c"> return open('file.html')</label>
+                    <label><input type="radio" name="q9" value="d"> return html('file.html')</label>
+                </div>
+
+                <div class="question">
+                    <p><strong>10.</strong> ¿Cuál es la estructura correcta de una ruta con parámetro?</p>
+                    <label><input type="radio" name="q10" value="a"> @app.route('/usuario/{id}')</label>
+                    <label><input type="radio" name="q10" value="b"> @app.route('/usuario/:id')</label>
+                    <label><input type="radio" name="q10" value="c"> @app.route('/usuario/&lt;id&gt;')</label>
+                    <label><input type="radio" name="q10" value="d"> @app.route('/usuario/$id')</label>
+                </div>
+
+                <button type="submit" class="btn-submit">Enviar respuestas</button>
+            </form>
+            <div id="quizResults" class="quiz-results hidden"></div>
+        </section>
+
+        <!-- Navigation -->
+        <nav class="class-nav">
+            <a href="clase-08.html" class="btn-prev">← Clase 08</a>
+            <a href="../index.html" class="btn-home">Volver a Módulo 1</a>
+            <a href="boss-battle.html" class="btn-next">Boss Battle →</a>
+        </nav>
+    </main>
+
+    <script src="../js/progress.js"></script>
+    <script>
+        // Quiz answers
+        const correctAnswers = {
+            q1: 'b',
+            q2: 'b',
+            q3: 'c',
+            q4: 'b',
+            q5: 'c',
+            q6: 'b',
+            q7: 'b',
+            q8: 'a',
+            q9: 'b',
+            q10: 'c'
+        };
+
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let correct = 0;
+            let total = Object.keys(correctAnswers).length;
+
+            for (let i = 1; i <= total; i++) {
+                const questionName = 'q' + i;
+                const selected = document.querySelector('input[name="' + questionName + '"]:checked');
+                if (selected && selected.value === correctAnswers[questionName]) {
+                    correct++;
+                }
+            }
+
+            const percentage = Math.round((correct / total) * 100);
+            const resultsDiv = document.getElementById('quizResults');
+
+            resultsDiv.innerHTML = `
+                <h3>Resultados</h3>
+                <p>Has acertado <strong>${correct} de ${total}</strong> preguntas (${percentage}%)</p>
+                ${percentage >= 70 ? '<p class="success">¡Excelente! Estás listo para continuar.</p>' : '<p class="warning">Revisa los conceptos y vuelve a intentarlo.</p>'}
+            `;
+            resultsDiv.classList.remove('hidden');
+
+            // Track progress
+            if (window.CourseProgress) {
+                CourseProgress.initQuiz('m1-c09');
+            }
+        });
+    </script>
+</body>
+</html>

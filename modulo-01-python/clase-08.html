@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase 08: Web Scraping con BeautifulSoup — Módulo 1</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <nav class="nav-breadcrumb">
+            <a href="#">Dashboard</a> > <a href="#">Módulo 1</a> > Clase 08
+        </nav>
+
+        <!-- Header -->
+        <header>
+            <h1>Clase 08: Web Scraping con BeautifulSoup</h1>
+            <p class="section-title">Semana 2 — Miércoles | 🎬 30 min + 💻 50 min + 🧪 15 min</p>
+        </header>
+
+        <!-- Video Section -->
+        <section class="card">
+            <h2 class="section-title">
+                <span class="section-icon">🎬</span> Vídeo: BeautifulSoup Tutorial
+            </h2>
+            <p>Aprende los fundamentos de web scraping con BeautifulSoup en esta introducción visual.</p>
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/XVv6mJpFOb0" allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section class="card">
+            <h2 class="section-title">
+                <span class="section-icon">📖</span> Resumen
+            </h2>
+
+            <h3>¿Qué es Web Scraping?</h3>
+            <p>
+                Web scraping es la técnica de extraer datos automáticamente de páginas web. En lugar de copiar-pegar
+                manualmente, usamos código para obtener información estructurada de HTML.
+            </p>
+
+            <div class="info">
+                <strong>Caso de uso:</strong> Extraer precios de productos, noticias, datos públicos, reviews,
+                cotizaciones bursátiles, etc.
+            </div>
+
+            <h3>El combo: Requests + BeautifulSoup</h3>
+            <p>Para hacer web scraping en Python necesitamos dos librerías:</p>
+            <ul>
+                <li><strong>requests</strong>: Descarga el contenido HTML de una URL</li>
+                <li><strong>BeautifulSoup</strong>: Analiza y navega el HTML para extraer datos</li>
+            </ul>
+
+            <div class="code-block">
+                <span class="lang-label">Python</span>
+                <pre><code># Instalar librerías
+pip install requests beautifulsoup4
+
+# Importar
+import requests
+from bs4 import BeautifulSoup</code></pre>
+            </div>
+
+            <h3>Flujo básico de scraping</h3>
+            <div class="code-block">
+                <span class="lang-label">Python</span>
+                <pre><code># 1. Descargar la página
+response = requests.get('https://ejemplo.com')
+html_content = response.text
+
+# 2. Parsear el HTML
+soup = BeautifulSoup(html_content, 'html.parser')
+
+# 3. Extraer datos
+titulo = soup.find('h1').text</code></pre>
+            </div>
+
+            <h3>Parsing HTML: find() vs find_all()</h3>
+            <p>BeautifulSoup te permite buscar elementos en el HTML:</p>
+
+            <div class="code-block">
+                <span class="lang-label">Python</span>
+                <pre><code>soup = BeautifulSoup(html, 'html.parser')
+
+# find() → obtiene el PRIMER elemento que coincide
+primer_parrafo = soup.find('p')
+
+# find_all() → obtiene TODOS los elementos que coinciden
+todos_parrafos = soup.find_all('p')
+
+# Buscar por atributos
+enlace_principal = soup.find('a', {'class': 'main-link'})
+
+# Buscar anidado
+contenedor = soup.find('div', {'id': 'content'})
+articulos = contenedor.find_all('article')</code></pre>
+            </div>
+
+            <h3>CSS Selectors (aprovecha tu conocimiento CSS)</h3>
+            <p>Si ya conoces CSS, puedes usar select() con los mismos selectores:</p>
+
+            <div class="code-block">
+                <span class="lang-label">Python</span>
+                <pre><code># Por clase
+soup.select('.producto')  # Todos con clase 'producto'
+soup.select_one('.producto')  # El primero
+
+# Por ID
+soup.select('#header')
+
+# Selectores combinados
+soup.select('div.card > p.titulo')  # Párrafos dentro de divs con clase card
+soup.select('a[href*="github"]')  # Enlaces cuyo href contiene 'github'</code></pre>
+            </div>
+
+            <h3>Navegando el árbol HTML</h3>
+            <div class="code-block">
+                <span class="lang-label">Python</span>
+                <pre><code>elemento = soup.find('h2')
+
+# Acceder a parent (elemento contenedor)
+contenedor = elemento.parent
+
+# Acceder a hermanos
+siguiente = elemento.next_sibling
+anterior = elemento.previous_sibling
+
+# Acceder a hijos
+primer_hijo = elemento.contents[0]</code></pre>
+            </div>
+
+            <h3>Extrayendo texto y atributos</h3>
+            <div class="code-block">
+                <span class="lang-label">Python</span>
+                <pre><code>enlace = soup.find('a')
+
+# Obtener texto limpio
+texto = enlace.text  # o .get_text()
+
+# Obtener atributos
+href = enlace['href']  # Acceso directo
+clase = enlace.get('class')  # Seguro (devuelve None si no existe)
+todos_attrs = enlace.attrs  # Diccionario de todos
+
+# HTML limpio
+print(enlace.string)  # Solo si tiene UN hijo de texto</code></pre>
+            </div>
+
+            <h3>Ética y robots.txt</h3>
+            <div class="warning">
+                <strong>⚠️ Importante:</strong>
+                <ul>
+                    <li>Respeta <code>robots.txt</code>: <code>https://ejemplo.com/robots.txt</code></li>
+                    <li>Revisa los <code>Terms of Service</code> del sitio</li>
+                    <li>No hagas scraping si la web tiene una API oficial</li>
+                    <li>Añade delays entre peticiones: <code>time.sleep(2)</code></li>
+                    <li>Identifica tu bot con User-Agent apropiado</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <span class="lang-label">Python</span>
+                <pre><code>import time
+
+# Agregar delay para no sobrecargar el servidor
+for url in urls:
+    response = requests.get(url)
+    # procesar...
+    time.sleep(2)  # Esperar 2 segundos entre peticiones</code></pre>
+            </div>
+        </section>
+
+        <!-- Practice Section -->
+        <section class="card">
+            <h2 class="section-title">
+                <span class="section-icon">💻</span> Práctica guiada: Scraper de Quotes
+            </h2>
+            <p>
+                Vamos a extraer citas del sitio público <strong>https://quotes.toscrape.com</strong>
+                y guardarlas en un archivo JSON.
+            </p>
+
+            <div class="reto-box">
+                <h3>Objetivo</h3>
+                <p>Scrapeador que extrae: autor, texto de la cita y tags. Guardamos en JSON.</p>
+
+                <h3>Código paso a paso</h3>
+                <div class="code-block">
+                    <span class="lang-label">Python</span>
+                    <pre><code>import requests
+from bs4 import BeautifulSoup
+import json
+
+# 1. Descargar la página
+url = 'https://quotes.toscrape.com'
+response = requests.get(url)
+soup = BeautifulSoup(response.content, 'html.parser')
+
+# 2. Encontrar todas las citas
+quotes_data = []
+
+# Cada cita está en un div con clase 'quote'
+for quote_div in soup.find_all('div', {'class': 'quote'}):
+
+    # Extraer el texto (está en span con clase 'text')
+    text = quote_div.find('span', {'class': 'text'}).text
+
+    # Extraer el autor (está en small con clase 'author')
+    author = quote_div.find('small', {'class': 'author'}).text
+
+    # Extraer tags (cada uno en un 'a' dentro de 'div.tags')
+    tags = []
+    for tag_a in quote_div.find_all('a', {'class': 'tag'}):
+        tags.append(tag_a.text)
+
+    # Guardar en estructura
+    quotes_data.append({
+        'text': text,
+        'author': author,
+        'tags': tags
+    })
+
+# 3. Guardar en JSON
+with open('quotes.json', 'w', encoding='utf-8') as f:
+    json.dump(quotes_data, f, ensure_ascii=False, indent=2)
+
+print(f'✅ Se extrajeron {len(quotes_data)} citas')</code></pre>
+                </div>
+
+                <h3>Output esperado (quotes.json)</h3>
+                <div class="code-block">
+                    <span class="lang-label">JSON</span>
+                    <pre><code>[
+  {
+    "text": ""The way to get started is to quit talking...",
+    "author": "Walt Disney",
+    "tags": ["inspirational", "action"]
+  },
+  {
+    "text": ""Don't let yesterday take up too much of today."",
+    "author": "Will Rogers",
+    "tags": ["inspirational", "life"]
+  }
+]</code></pre>
+                </div>
+
+                <h3>Pasos para probar</h3>
+                <ol>
+                    <li>Copia el código en un archivo <code>scraper.py</code></li>
+                    <li>Ejecuta: <code>python scraper.py</code></li>
+                    <li>Verifica el archivo <code>quotes.json</code> generado</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Challenge Section -->
+        <section class="card">
+            <div class="reto-box">
+                <h2 class="section-title">
+                    <span class="section-icon">🧪</span> Mini-reto: Top 10 Repos de GitHub
+                </h2>
+                <p>
+                    Construye un scraper que extraiga los <strong>10 repositorios más populares</strong>
+                    de GitHub (por número de estrellas) en un tema específico.
+                </p>
+
+                <h3>Requisitos</h3>
+                <ul>
+                    <li>Scrapeador de GitHub Trending (https://github.com/trending)</li>
+                    <li>Extrae: nombre repo, descripción, lenguaje, estrellas hoy, estrellas totales</li>
+                    <li>Filtra solo los primeros 10</li>
+                    <li>Guarda en <code>top_repos.json</code></li>
+                </ul>
+
+                <h3>Pistas</h3>
+                <div class="code-block">
+                    <span class="lang-label">Python</span>
+                    <pre><code># Los repos están en articulos con clase 'Box-row'
+article = soup.find('article', {'class': 'Box-row'})
+
+# Nombre/enlace: 'h2' dentro del articulo
+# Descripción: 'p' con clase 'col-9'
+# Lenguaje: 'span' con atributo 'itemprop="programmingLanguage"'
+# Estrellas: 'span.d-inline-block.mr-3' para las del día</code></pre>
+                </div>
+
+                <h3>Bonus (opcional)</h3>
+                <ul>
+                    <li>Parametriza el lenguaje: <code>python scraper_github.py --lang python</code></li>
+                    <li>Maneja paginación para extraer 50 repos</li>
+                    <li>Crea una tabla HTML que muestre los resultados</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section class="card">
+            <h2 class="section-title">
+                <span class="section-icon">📝</span> Test: Web Scraping con BeautifulSoup
+            </h2>
+            <div id="quiz-container" class="quiz-container"></div>
+        </section>
+
+        <!-- Navigation Footer -->
+        <nav class="clase-nav">
+            <div class="nav-links">
+                <a href="clase-07.html" class="btn">← Clase 07</a>
+                <a href="clase-09.html" class="btn btn-green">Clase 09 →</a>
+            </div>
+        </nav>
+    </div>
+
+    <script src="../js/progress.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const questions = [
+                {
+                    id: 'q1',
+                    text: '¿Cuál es la diferencia entre requests.get() y BeautifulSoup()?',
+                    options: [
+                        { value: 'a', label: 'requests descarga el HTML, BeautifulSoup lo analiza' },
+                        { value: 'b', label: 'Son lo mismo, uno es alias del otro' },
+                        { value: 'c', label: 'requests extrae datos, BeautifulSoup descarga' },
+                        { value: 'd', label: 'No hay diferencia, se usan indistintamente' }
+                    ],
+                    correct: 'a'
+                },
+                {
+                    id: 'q2',
+                    text: '¿Qué método devuelve el PRIMER elemento que coincide?',
+                    options: [
+                        { value: 'a', label: 'find_all()' },
+                        { value: 'b', label: 'find()' },
+                        { value: 'c', label: 'select_one()' },
+                        { value: 'd', label: 'Tanto b como c son correctas' }
+                    ],
+                    correct: 'd'
+                },
+                {
+                    id: 'q3',
+                    text: '¿Cómo extraes el texto de un elemento BeautifulSoup?',
+                    options: [
+                        { value: 'a', label: 'elemento.html' },
+                        { value: 'b', label: 'elemento.text o elemento.get_text()' },
+                        { value: 'c', label: 'elemento.content' },
+                        { value: 'd', label: 'elemento.extract()' }
+                    ],
+                    correct: 'b'
+                },
+                {
+                    id: 'q4',
+                    text: '¿Cuál es la sintaxis correcta para usar selectores CSS?',
+                    options: [
+                        { value: 'a', label: "soup.find('div.miclase')" },
+                        { value: 'b', label: "soup.select('.miclase')" },
+                        { value: 'c', label: "soup.css('div.miclase')" },
+                        { value: 'd', label: "soup.query('.miclase')" }
+                    ],
+                    correct: 'b'
+                },
+                {
+                    id: 'q5',
+                    text: '¿Cómo accedes a un atributo HTML de forma segura?',
+                    options: [
+                        { value: 'a', label: "elemento['atributo']" },
+                        { value: 'b', label: "elemento.get('atributo')" },
+                        { value: 'c', label: "elemento.attr('atributo')" },
+                        { value: 'd', label: "elemento.atributo" }
+                    ],
+                    correct: 'b'
+                },
+                {
+                    id: 'q6',
+                    text: '¿Qué archivo deberías consultar ANTES de hacer scraping?',
+                    options: [
+                        { value: 'a', label: '.gitignore' },
+                        { value: 'b', label: 'robots.txt' },
+                        { value: 'c', label: 'sitemap.xml' },
+                        { value: 'd', label: 'config.json' }
+                    ],
+                    correct: 'b'
+                },
+                {
+                    id: 'q7',
+                    text: '¿Por qué agregar time.sleep() entre peticiones?',
+                    options: [
+                        { value: 'a', label: 'Para que Python procese más rápido' },
+                        { value: 'b', label: 'Para no sobrecargar el servidor' },
+                        { value: 'c', label: 'Porque BeautifulSoup lo requiere' },
+                        { value: 'd', label: 'No es necesario nunca' }
+                    ],
+                    correct: 'b'
+                },
+                {
+                    id: 'q8',
+                    text: '¿Cuál es la forma correcta de obtener el padre de un elemento?',
+                    options: [
+                        { value: 'a', label: 'elemento.parent' },
+                        { value: 'b', label: 'elemento.padre()' },
+                        { value: 'c', label: 'elemento.get_parent()' },
+                        { value: 'd', label: 'elemento.parents[0]' }
+                    ],
+                    correct: 'a'
+                },
+                {
+                    id: 'q9',
+                    text: '¿Qué parseador recomendamos usar con BeautifulSoup?',
+                    options: [
+                        { value: 'a', label: "'xml'" },
+                        { value: 'b', label: "'html.parser'" },
+                        { value: 'c', label: "'lxml'" },
+                        { value: 'd', label: 'Cualquiera funciona igual' }
+                    ],
+                    correct: 'b'
+                },
+                {
+                    id: 'q10',
+                    text: '¿Cuál es mejor práctica: scraping o usar la API oficial?',
+                    options: [
+                        { value: 'a', label: 'Siempre scraping, es más directo' },
+                        { value: 'b', label: 'Siempre la API oficial si existe' },
+                        { value: 'c', label: 'No hay diferencia' },
+                        { value: 'd', label: 'Depende del color del sitio web' }
+                    ],
+                    correct: 'b'
+                }
+            ];
+
+            // Initialize quiz if CourseProgress is available
+            if (typeof CourseProgress !== 'undefined' && CourseProgress.initQuiz) {
+                CourseProgress.initQuiz('quiz-container', questions, 'm1-c08');
+            } else {
+                console.warn('CourseProgress not available for quiz initialization');
+            }
+        });
+    </script>
+</body>
+</html>

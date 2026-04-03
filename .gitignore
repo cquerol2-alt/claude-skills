@@ -1,0 +1,34 @@
+# Sistema Operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.sublime-project
+.sublime-workspace
+
+# Node (si en el futuro se añade build tools)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Archivos temporales de Office
+~$*
+*.tmp
+
+# Logs
+*.log
+npm-debug.log*
+
+# Archivos de sistema
+.env.local
+.env.*.local

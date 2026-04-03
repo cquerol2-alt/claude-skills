@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Boss Battle: Mini API en Flask — Módulo 1</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* === BOSS BATTLE SPECIFIC STYLES === */
+
+        /* Epic gradient border for main card */
+        .boss-main-card {
+            background: var(--bg-card);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta), var(--neon-green)) 1;
+            border-radius: var(--radius);
+            padding: 2.5em;
+            margin-bottom: 2em;
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 0 30px rgba(0, 240, 255, 0.2),
+                inset 0 0 30px rgba(0, 240, 255, 0.05);
+        }
+
+        .boss-main-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 0, 229, 0.08) 0%, transparent 70%);
+            animation: boss-aura 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes boss-aura {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-10px, -10px); }
+        }
+
+        .boss-main-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Epic header styling */
+        .boss-header {
+            text-align: center;
+            margin-bottom: 2em;
+        }
+
+        .boss-header h1 {
+            font-size: 3em;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(0, 240, 255, 0.3);
+            margin-bottom: 0.3em;
+            letter-spacing: 2px;
+        }
+
+        .boss-subtitle {
+            font-size: 1.3em;
+            color: var(--neon-yellow);
+            font-weight: 700;
+            margin-bottom: 0.5em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .boss-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2em;
+            margin-top: 1.5em;
+            flex-wrap: wrap;
+        }
+
+        .boss-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            font-size: 1.1em;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        /* Mission section with dramatic styling */
+        .boss-section {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.03), rgba(255, 0, 229, 0.03));
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius);
+            padding: 2em;
+            margin-bottom: 2em;
+            transition: var(--transition);
+        }
+
+        .boss-section:hover {
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.15);
+        }
+
+        .boss-section h2 {
+            font-size: 2em;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1em;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .boss-section h3 {
+            font-size: 1.3em;
+            color: var(--neon-magenta);
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            padding-bottom: 0.5em;
+            border-bottom: 2px solid var(--neon-magenta);
+        }
+
+        /* Checklist styling */
+        .requirements-checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .requirements-checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1em;
+            padding: 1em;
+            background: rgba(0, 240, 255, 0.05);
+            border-left: 3px solid var(--neon-cyan);
+            margin-bottom: 0.8em;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .requirements-checklist li:hover {
+            background: rgba(0, 240, 255, 0.1);
+            border-color: var(--neon-green);
+        }
+
+        .requirements-checklist input[type="checkbox"] {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            margin-top: 2px;
+            accent-color: var(--neon-cyan);
+            cursor: pointer;
+        }
+
+        .requirements-checklist span {
+            flex: 1;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        /* Phase styling */
+        .phase {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-sm);
+            padding: 1.5em;
+            margin-bottom: 1.5em;
+        }
+
+        .phase-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--neon-green);
+            margin-bottom: 1em;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .phase-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            border-radius: 50%;
+            color: white;
+            font-weight: 800;
+            font-size: 1.1em;
+        }
+
+        /* Code block collapsible */
+        .code-expandable {
+            background: #1a1a2e;
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-sm);
+            margin: 1.5em 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(0, 240, 255, 0.1);
+            padding: 1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.8em;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .code-header:hover {
+            background: rgba(0, 240, 255, 0.2);
+        }
+
+        .code-toggle {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            transition: transform 0.3s ease;
+        }
+
+        .code-expandable.expanded .code-toggle {
+            transform: rotate(180deg);
+        }
+
+        .code-content {
+            display: none;
+            padding: 1.5em;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .code-expandable.expanded .code-content {
+            display: block;
+        }
+
+        .code-content pre {
+            background: #0a0a1a;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 1.2em;
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            font-size: 0.85em;
+        }
+
+        .code-content code {
+            color: var(--neon-green);
+            font-family: var(--font-mono);
+        }
+
+        /* Rubric table */
+        .rubric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+        }
+
+        .rubric-table th,
+        .rubric-table td {
+            padding: 1em;
+            text-align: left;
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        .rubric-table th {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--neon-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+
+        .rubric-table tr:hover {
+            background: rgba(0, 240, 255, 0.05);
+        }
+
+        .rubric-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8em;
+        }
+
+        .rubric-checkbox {
+            width: 24px;
+            height: 24px;
+            accent-color: var(--neon-green);
+            cursor: pointer;
+        }
+
+        /* Completion button - EPIC */
+        .btn-complete-class {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8em;
+            padding: 1em 2.5em;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+            color: white;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+            text-decoration: none;
+            display: inline-block;
+            margin: 2em 0;
+        }
+
+        .btn-complete-class:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(57, 255, 20, 0.5);
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+        }
+
+        .btn-complete-class:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-complete-class.completed {
+            background: linear-gradient(135deg, var(--neon-green), #39ff14);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(57, 255, 20, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(57, 255, 20, 0.6); }
+        }
+
+        /* XP reward display */
+        .xp-reward {
+            display: inline-block;
+            padding: 0.5em 1.2em;
+            background: rgba(255, 230, 0, 0.2);
+            border: 2px solid var(--neon-yellow);
+            border-radius: 50px;
+            color: var(--neon-yellow);
+            font-weight: 700;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Navigation between classes */
+        .clase-nav-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 2px solid var(--border-glow);
+            gap: 1em;
+        }
+
+        .clase-nav-bottom a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            padding: 0.8em 1.5em;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 50px;
+            color: var(--neon-cyan);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .clase-nav-bottom a:hover {
+            background: var(--neon-cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .boss-header h1 { font-size: 2em; }
+            .boss-meta { gap: 1em; }
+            .clase-nav-bottom { flex-wrap: wrap; }
+            .code-content { max-height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb Navigation -->
+    <nav class="nav-breadcrumb" style="padding: 1em; border-bottom: 1px solid var(--border-glow);">
+        <a href="../index.html">Dashboard</a>
+        <span>></span>
+        <a href="../index.html">Módulo 1</a>
+        <span>></span>
+        <span>🎯 Boss Battle</span>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- EPIC BOSS BATTLE CARD -->
+        <div class="boss-main-card">
+            <div class="boss-header">
+                <h1>🎯 BOSS BATTLE: Mini API en Flask</h1>
+                <p class="boss-subtitle">Proyecto Final — Módulo 1: Python para Devs Web</p>
+                <div class="boss-meta">
+                    <div class="boss-meta-item">⏱️ 2 horas</div>
+                    <div class="boss-meta-item">📍 Semana 2 — Viernes</div>
+                    <div class="xp-reward">50 XP</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === LA MISIÓN === -->
+        <section class="boss-section">
+            <h2>🎮 La Misión</h2>
+            <p style="font-size: 1.1em; line-height: 1.8; color: var(--text-primary);">
+                Has completado los 9 niveles iniciales. Ahora es momento de tu <strong>Boss Battle</strong> final del Módulo 1.
+            </p>
+            <p style="font-size: 1.1em; line-height: 1.8; color: var(--text-primary); margin-top: 1em;">
+                Tu misión: <strong>construir una API REST completa en Flask</strong> que gestiona una colección de videojuegos.
+                Esta API debe manejar las operaciones CRUD completas (Create, Read, Update, Delete),
+                almacenar datos en JSON, implementar manejo de errores robusto,
+                y ser completamente testeable con <code>curl</code> o <code>Postman</code>.
+            </p>
+            <p style="font-size: 1.1em; line-height: 1.8; color: var(--text-primary); margin-top: 1em;">
+                Este es tu <strong>proyecto completo e integrador</strong> de todo lo aprendido:
+                virtualenvs, pip, Flask, JSON, variables de entorno, y buenas prácticas de desarrollo.
+            </p>
+        </section>
+
+        <!-- === REQUISITOS === -->
+        <section class="boss-section">
+            <h2>✅ Requisitos del Proyecto</h2>
+            <p>Tu proyecto debe cumplir con los siguientes puntos:</p>
+
+            <ul class="requirements-checklist">
+                <li>
+                    <input type="checkbox" id="req-1">
+                    <span><strong>5+ endpoints REST:</strong> GET /api/juegos, GET /api/juegos/&lt;id&gt;, POST /api/juegos, PUT /api/juegos/&lt;id&gt;, DELETE /api/juegos/&lt;id&gt;</span>
+                </li>
+                <li>
+                    <input type="checkbox" id="req-2">
+                    <span><strong>Almacenamiento en JSON:</strong> Los datos se guardan en un archivo <code>juegos.json</code> (no base de datos aún)</span>
+                </li>
+                <li>
+                    <input type="checkbox" id="req-3">
+                    <span><strong>Respuestas en JSON:</strong> Todos los endpoints devuelven JSON con estructura clara</span>
+                </li>
+                <li>
+                    <input type="checkbox" id="req-4">
+                    <span><strong>Manejo de errores:</strong> 404 (no encontrado), 400 (solicitud inválida), 201 (creado), 200 (OK), 204 (sin contenido)</span>
+                </li>
+                <li>
+                    <input type="checkbox" id="req-5">
+                    <span><strong>Estructura limpia:</strong> Carpeta del proyecto con venv, requirements.txt, app.py, juegos.json, y README.md</span>
+                </li>
+                <li>
+                    <input type="checkbox" id="req-6">
+                    <span><strong>requirements.txt:</strong> Incluye Flask y cualquier otra dependencia necesaria</span>
+                </li>
+                <li>
+                    <input type="checkbox" id="req-7">
+                    <span><strong>README.md:</strong> Instrucciones claras para ejecutar el proyecto (cómo crear venv, instalar deps, correr la API)</span>
+                </li>
+                <li>
+                    <input type="checkbox" id="req-8">
+                    <span><strong>Validación:</strong> Los endpoints validan entrada de datos (títulos no vacíos, géneros válidos, etc.)</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- === GUÍA PASO A PASO === -->
+        <section class="boss-section">
+            <h2>🗺️ Guía Paso a Paso</h2>
+
+            <div class="phase">
+                <div class="phase-title">
+                    <span class="phase-number">1</span>
+                    Preparación: Estructura y Virtualenv
+                </div>
+                <h4 style="color: var(--neon-cyan); margin-bottom: 1em;">Qué hacer:</h4>
+                <ol style="margin-left: 1.5em; line-height: 2;">
+                    <li>Crea una carpeta llamada <code>flask-game-api</code></li>
+                    <li>Entra en la carpeta: <code>cd flask-game-api</code></li>
+                    <li>Crea el virtualenv: <code>python -m venv venv</code></li>
+                    <li>Activa venv:
+                        <ul style="margin-top: 0.5em;">
+                            <li><strong>Linux/Mac:</strong> <code>source venv/bin/activate</code></li>
+                            <li><strong>Windows:</strong> <code>venv\Scripts\activate</code></li>
+                        </ul>
+                    </li>
+                    <li>Instala Flask: <code>pip install flask</code></li>
+                    <li>Crea <code>requirements.txt</code>: <code>pip freeze > requirements.txt</code></li>
+                </ol>
+                <div class="info" style="margin-top: 1.5em;">
+                    Asegúrate de que <code>(venv)</code> aparezca en tu terminal. Si ves eso, el virtualenv está activado.
+                </div>
+            </div>
+
+            <div class="phase">
+                <div class="phase-title">
+                    <span class="phase-number">2</span>
+                    Modelo de Datos: juegos.json
+                </div>
+                <h4 style="color: var(--neon-cyan); margin-bottom: 1em;">Qué hacer:</h4>
+                <p>Crea un archivo <code>juegos.json</code> en la raíz del proyecto con datos iniciales:</p>
+                <pre style="background: #1a1a2e; padding: 1.2em; border-radius: 6px; overflow-x: auto; border-left: 3px solid var(--neon-green);"><code style="color: var(--neon-green);">[
+  {
+    "id": 1,
+    "titulo": "The Legend of Zelda",
+    "genero": "aventura",
+    "anio": 1986,
+    "plataforma": "NES",
+    "rating": 9.5
+  },
+  {
+    "id": 2,
+    "titulo": "Super Mario Bros",
+    "genero": "plataforma",
+    "anio": 1985,
+    "plataforma": "NES",
+    "rating": 9.0
+  }
+]</code></pre>
+                <div class="tip" style="margin-top: 1.5em;">
+                    Este es tu "mini-base de datos". Cada juego tiene id único, título, género, año, plataforma y rating (0-10).
+                </div>
+            </div>
+
+            <div class="phase">
+                <div class="phase-title">
+                    <span class="phase-number">3</span>
+                    Endpoints de Lectura (GET)
+                </div>
+                <h4 style="color: var(--neon-cyan); margin-bottom: 1em;">Qué hacer:</h4>
+                <p>Implementa dos endpoints GET:</p>
+                <ul style="margin-left: 1.5em; line-height: 2;">
+                    <li><code>GET /api/juegos</code> — Devuelve la lista completa de juegos</li>
+                    <li><code>GET /api/juegos/&lt;id&gt;</code> — Devuelve un juego específico o 404 si no existe</li>
+                </ul>
+                <p style="margin-top: 1.5em; font-style: italic; color: var(--text-muted);">
+                    💡 Tip: Carga los datos de <code>juegos.json</code> con <code>json.load()</code>, léelos en memoria, y devuelve el JSON.
+                </p>
+            </div>
+
+            <div class="phase">
+                <div class="phase-title">
+                    <span class="phase-number">4</span>
+                    Endpoints de Escritura (POST, PUT, DELETE)
+                </div>
+                <h4 style="color: var(--neon-cyan); margin-bottom: 1em;">Qué hacer:</h4>
+                <ul style="margin-left: 1.5em; line-height: 2;">
+                    <li><code>POST /api/juegos</code> — Crea un nuevo juego. Valida que el JSON tenga título y género. Devuelve 201 Created.</li>
+                    <li><code>PUT /api/juegos/&lt;id&gt;</code> — Actualiza un juego existente. Devuelve 200 OK o 404.</li>
+                    <li><code>DELETE /api/juegos/&lt;id&gt;</code> — Elimina un juego. Devuelve 204 No Content o 404.</li>
+                </ul>
+                <p style="margin-top: 1.5em; font-style: italic; color: var(--text-muted);">
+                    💡 Tip: Después de cada cambio (POST, PUT, DELETE), reescribe <code>juegos.json</code> con <code>json.dump()</code>.
+                    Genera IDs nuevos con <code>max([j['id'] for j in juegos]) + 1</code> (o usa uuid si prefieres).
+                </p>
+            </div>
+
+            <div class="phase">
+                <div class="phase-title">
+                    <span class="phase-number">5</span>
+                    Manejo de Errores y Testing
+                </div>
+                <h4 style="color: var(--neon-cyan); margin-bottom: 1em;">Qué hacer:</h4>
+                <ul style="margin-left: 1.5em; line-height: 2;">
+                    <li>Implementa respuestas de error claras: <code>{"error": "Mensaje de error"}</code></li>
+                    <li>Usa <code>abort(404)</code> cuando no exista un recurso</li>
+                    <li>Usa <code>abort(400)</code> cuando los datos sean inválidos</li>
+                    <li>Testea cada endpoint con <code>curl</code> o <code>Postman</code></li>
+                </ul>
+                <p style="margin-top: 1.5em; font-style: italic; color: var(--text-muted);">
+                    💡 Ejemplos de curl para testear:
+                </p>
+                <pre style="background: #1a1a2e; padding: 1.2em; border-radius: 6px; overflow-x: auto; border-left: 3px solid var(--neon-green);"><code style="color: var(--neon-green);"># GET todos los juegos
+curl http://localhost:5000/api/juegos
+
+# GET un juego específico
+curl http://localhost:5000/api/juegos/1
+
+# POST crear un juego
+curl -X POST http://localhost:5000/api/juegos \
+  -H "Content-Type: application/json" \
+  -d '{"titulo":"Zelda II","genero":"aventura","anio":1987,"plataforma":"NES","rating":8.5}'
+
+# PUT actualizar
+curl -X PUT http://localhost:5000/api/juegos/1 \
+  -H "Content-Type: application/json" \
+  -d '{"titulo":"Updated Title","genero":"aventura","anio":1986,"plataforma":"NES","rating":9.8}'
+
+# DELETE
+curl -X DELETE http://localhost:5000/api/juegos/1</code></pre>
+            </div>
+        </section>
+
+        <!-- === CÓDIGO COMPLETO DE REFERENCIA === -->
+        <section class="boss-section">
+            <h2>💻 Código Completo de Referencia</h2>
+            <p style="margin-bottom: 1.5em;">
+                Aquí tienes una solución completa que puedes usar como referencia.
+                <strong>Intenta hacer el tuyo primero</strong>, pero puedes consultar esto si te atascas.
+            </p>
+
+            <!-- app.py expandable -->
+            <div class="code-expandable">
+                <div class="code-header">
+                    <span class="code-toggle">▼</span>
+                    <span>app.py — Aplicación Flask completa</span>
+                </div>
+                <div class="code-content">
+                    <pre><code>import json
+import os
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# Ruta al archivo de datos
+DATA_FILE = 'juegos.json'
+
+def load_games():
+    """Carga los juegos desde JSON"""
+    if not os.path.exists(DATA_FILE):
+        return []
+    with open(DATA_FILE, 'r', encoding='utf-8') as f:
+        try:
+            return json.load(f)
+        except:
+            return []
+
+def save_games(games):
+    """Guarda los juegos en JSON"""
+    with open(DATA_FILE, 'w', encoding='utf-8') as f:
+        json.dump(games, f, ensure_ascii=False, indent=2)
+
+def get_next_id(games):
+    """Obtiene el siguiente ID disponible"""
+    if not games:
+        return 1
+    return max([g['id'] for g in games]) + 1
+
+# ============= ENDPOINTS =============
+
+@app.route('/api/juegos', methods=['GET'])
+def get_all_games():
+    """GET /api/juegos — Devuelve todos los juegos"""
+    games = load_games()
+    return jsonify(games), 200
+
+@app.route('/api/juegos/&lt;int:game_id&gt;', methods=['GET'])
+def get_game(game_id):
+    """GET /api/juegos/&lt;id&gt; — Devuelve un juego específico"""
+    games = load_games()
+    game = next((g for g in games if g['id'] == game_id), None)
+
+    if not game:
+        return jsonify({'error': f'Juego con id {game_id} no encontrado'}), 404
+
+    return jsonify(game), 200
+
+@app.route('/api/juegos', methods=['POST'])
+def create_game():
+    """POST /api/juegos — Crea un nuevo juego"""
+    data = request.get_json()
+
+    # Validación
+    if not data:
+        return jsonify({'error': 'No JSON data provided'}), 400
+
+    required_fields = ['titulo', 'genero', 'anio', 'plataforma', 'rating']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Campo requerido: {field}'}), 400
+
+    # Validar tipos y valores
+    if not isinstance(data['titulo'], str) or not data['titulo'].strip():
+        return jsonify({'error': 'El título debe ser un string no vacío'}), 400
+
+    if not isinstance(data['rating'], (int, float)) or not (0 &lt;= data['rating'] &lt;= 10):
+        return jsonify({'error': 'Rating debe estar entre 0 y 10'}), 400
+
+    games = load_games()
+
+    # Crear nuevo juego
+    new_game = {
+        'id': get_next_id(games),
+        'titulo': data['titulo'].strip(),
+        'genero': data['genero'].strip(),
+        'anio': int(data['anio']),
+        'plataforma': data['plataforma'].strip(),
+        'rating': float(data['rating'])
+    }
+
+    games.append(new_game)
+    save_games(games)
+
+    return jsonify(new_game), 201
+
+@app.route('/api/juegos/&lt;int:game_id&gt;', methods=['PUT'])
+def update_game(game_id):
+    """PUT /api/juegos/&lt;id&gt; — Actualiza un juego"""
+    games = load_games()
+    game = next((g for g in games if g['id'] == game_id), None)
+
+    if not game:
+        return jsonify({'error': f'Juego con id {game_id} no encontrado'}), 404
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No JSON data provided'}), 400
+
+    # Actualizar campos si se proporcionan
+    if 'titulo' in data:
+        if not data['titulo'].strip():
+            return jsonify({'error': 'El título no puede estar vacío'}), 400
+        game['titulo'] = data['titulo'].strip()
+
+    if 'genero' in data:
+        game['genero'] = data['genero'].strip()
+
+    if 'anio' in data:
+        game['anio'] = int(data['anio'])
+
+    if 'plataforma' in data:
+        game['plataforma'] = data['plataforma'].strip()
+
+    if 'rating' in data:
+        if not (0 &lt;= data['rating'] &lt;= 10):
+            return jsonify({'error': 'Rating debe estar entre 0 y 10'}), 400
+        game['rating'] = float(data['rating'])
+
+    save_games(games)
+
+    return jsonify(game), 200
+
+@app.route('/api/juegos/&lt;int:game_id&gt;', methods=['DELETE'])
+def delete_game(game_id):
+    """DELETE /api/juegos/&lt;id&gt; — Elimina un juego"""
+    games = load_games()
+    game = next((g for g in games if g['id'] == game_id), None)
+
+    if not game:
+        return jsonify({'error': f'Juego con id {game_id} no encontrado'}), 404
+
+    games = [g for g in games if g['id'] != game_id]
+    save_games(games)
+
+    return jsonify({'message': f'Juego {game_id} eliminado'}), 204
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'error': 'Recurso no encontrado'}), 404
+
+@app.errorhandler(500)
+def server_error(error):
+    return jsonify({'error': 'Error interno del servidor'}), 500
+
+# ============= MAIN =============
+
+if __name__ == '__main__':
+    # Crear juegos.json si no existe
+    if not os.path.exists(DATA_FILE):
+        initial_games = [
+            {'id': 1, 'titulo': 'The Legend of Zelda', 'genero': 'aventura', 'anio': 1986, 'plataforma': 'NES', 'rating': 9.5},
+            {'id': 2, 'titulo': 'Super Mario Bros', 'genero': 'plataforma', 'anio': 1985, 'plataforma': 'NES', 'rating': 9.0},
+            {'id': 3, 'titulo': 'Pac-Man', 'genero': 'arcade', 'anio': 1980, 'plataforma': 'Arcade', 'rating': 8.5},
+        ]
+        save_games(initial_games)
+
+    app.run(debug=True, port=5000)
+</code></pre>
+                </div>
+            </div>
+
+            <!-- requirements.txt expandable -->
+            <div class="code-expandable" style="margin-top: 1.5em;">
+                <div class="code-header">
+                    <span class="code-toggle">▼</span>
+                    <span>requirements.txt</span>
+                </div>
+                <div class="code-content">
+                    <pre><code>Flask==3.0.0
+Werkzeug==3.0.1</code></pre>
+                </div>
+            </div>
+
+            <!-- README.md expandable -->
+            <div class="code-expandable" style="margin-top: 1.5em;">
+                <div class="code-header">
+                    <span class="code-toggle">▼</span>
+                    <span>README.md — Instrucciones de ejecución</span>
+                </div>
+                <div class="code-content">
+                    <pre><code"># Mini API de Juegos en Flask
+
+API REST completa para gestionar una colección de videojuegos clásicos.
+
+## Instalación y Configuración
+
+### 1. Crear y activar virtualenv
+
+**En Linux/macOS:**
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+**En Windows:**
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+### 2. Instalar dependencias
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Ejecutar la API
+
+```bash
+python app.py
+```
+
+La API estará disponible en `http://localhost:5000`
+
+## Endpoints Disponibles
+
+### GET /api/juegos
+Obtiene la lista completa de juegos.
+
+**Respuesta (200):**
+```json
+[
+  {
+    "id": 1,
+    "titulo": "The Legend of Zelda",
+    "genero": "aventura",
+    "anio": 1986,
+    "plataforma": "NES",
+    "rating": 9.5
+  }
+]
+```
+
+### GET /api/juegos/&lt;id&gt;
+Obtiene un juego específico.
+
+**Respuesta (200):**
+```json
+{
+  "id": 1,
+  "titulo": "The Legend of Zelda",
+  "genero": "aventura",
+  "anio": 1986,
+  "plataforma": "NES",
+  "rating": 9.5
+}
+```
+
+### POST /api/juegos
+Crea un nuevo juego.
+
+**Request:**
+```json
+{
+  "titulo": "Nuevo Juego",
+  "genero": "aventura",
+  "anio": 2024,
+  "plataforma": "Nintendo Switch",
+  "rating": 8.5
+}
+```
+
+**Respuesta (201):** El juego creado con ID asignado
+
+### PUT /api/juegos/&lt;id&gt;
+Actualiza un juego existente.
+
+**Request:**
+```json
+{
+  "rating": 9.0
+}
+```
+
+**Respuesta (200):** El juego actualizado
+
+### DELETE /api/juegos/&lt;id&gt;
+Elimina un juego.
+
+**Respuesta (204):** Sin contenido (pero juego eliminado)
+
+## Testing con curl
+
+```bash
+# Ver todos los juegos
+curl http://localhost:5000/api/juegos
+
+# Ver un juego específico
+curl http://localhost:5000/api/juegos/1
+
+# Crear un juego
+curl -X POST http://localhost:5000/api/juegos \
+  -H "Content-Type: application/json" \
+  -d '{"titulo":"Nuevo","genero":"acción","anio":2024,"plataforma":"PS5","rating":8.5}'
+
+# Actualizar
+curl -X PUT http://localhost:5000/api/juegos/1 \
+  -H "Content-Type: application/json" \
+  -d '{"rating":9.5}'
+
+# Eliminar
+curl -X DELETE http://localhost:5000/api/juegos/1
+```
+
+## Estructura del Proyecto
+
+```
+flask-game-api/
+├── venv/                 # Virtualenv
+├── app.py               # Aplicación principal
+├── juegos.json          # Base de datos en JSON
+├── requirements.txt     # Dependencias
+└── README.md           # Este archivo
+```
+
+## Tecnologías
+
+- **Flask** — Framework web minimalista en Python
+- **JSON** — Almacenamiento de datos
+- **Python 3.8+**</code></pre>
+                </div>
+            </div>
+
+            <div class="info" style="margin-top: 2em;">
+                Haz clic en cada sección para expandir y ver el código completo.
+                Este código es <strong>100% funcional</strong> — puedes copiarlo directamente y adaptarlo.
+            </div>
+        </section>
+
+        <!-- === CRITERIOS DE EVALUACIÓN === -->
+        <section class="boss-section">
+            <h2>🎯 Criterios de Evaluación</h2>
+            <p style="margin-bottom: 1.5em;">
+                Marca cada punto conforme completes el proyecto. Todos deben estar verificados para completar el Boss Battle.
+            </p>
+
+            <table class="rubric-table">
+                <thead>
+                    <tr>
+                        <th>Criterio</th>
+                        <th>Descripción</th>
+                        <th style="width: 100px;">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Estructura</strong></td>
+                        <td>Proyecto con carpetas limpias, venv, requirements.txt, y archivos bien organizados</td>
+                        <td><input type="checkbox" class="rubric-checkbox" name="rubric"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>GET endpoints</strong></td>
+                        <td>GET /api/juegos y GET /api/juegos/&lt;id&gt; funcionan correctamente</td>
+                        <td><input type="checkbox" class="rubric-checkbox" name="rubric"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>POST endpoint</strong></td>
+                        <td>POST /api/juegos crea juegos con validación y devuelve 201</td>
+                        <td><input type="checkbox" class="rubric-checkbox" name="rubric"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>PUT endpoint</strong></td>
+                        <td>PUT /api/juegos/&lt;id&gt; actualiza juegos y devuelve 200 o 404</td>
+                        <td><input type="checkbox" class="rubric-checkbox" name="rubric"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>DELETE endpoint</strong></td>
+                        <td>DELETE /api/juegos/&lt;id&gt; elimina juegos y devuelve 204 o 404</td>
+                        <td><input type="checkbox" class="rubric-checkbox" name="rubric"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>JSON persistence</strong></td>
+                        <td>Los datos se guardan y cargan correctamente desde juegos.json</td>
+                        <td><input type="checkbox" class="rubric-checkbox" name="rubric"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Error handling</strong></td>
+                        <td>Devuelve códigos HTTP correctos (400, 404, 201, 200, 204)</td>
+                        <td><input type="checkbox" class="rubric-checkbox" name="rubric"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Validación</strong></td>
+                        <td>Los endpoints validan datos de entrada (títulos no vacíos, ratings 0-10, etc.)</td>
+                        <td><input type="checkbox" class="rubric-checkbox" name="rubric"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>README.md</strong></td>
+                        <td>Incluye instrucciones claras para instalar y ejecutar la API</td>
+                        <td><input type="checkbox" class="rubric-checkbox" name="rubric"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Código limpio</strong></td>
+                        <td>Código legible, comentado, sin errores, buenas prácticas</td>
+                        <td><input type="checkbox" class="rubric-checkbox" name="rubric"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- === ENTREGA === -->
+        <section class="boss-section">
+            <h2>📤 Cómo Entregar</h2>
+            <h3>Opción 1: GitHub (Recomendado)</h3>
+            <ol style="margin-left: 1.5em; line-height: 2;">
+                <li>Crea un nuevo repositorio público en GitHub llamado <code>flask-game-api</code></li>
+                <li>Añade tu proyecto (sin carpeta venv):
+                    <pre style="background: #1a1a2e; padding: 1em; margin: 0.5em 0; border-radius: 6px;"><code style="color: var(--neon-green);">git init
+git add .
+git commit -m "Initial commit: Mini API en Flask"
+git push origin main</code></pre>
+                </li>
+                <li>Asegúrate de incluir un <code>.gitignore</code> que excluya <code>venv/</code> y <code>__pycache__/</code></li>
+                <li>Comparte el enlace del repositorio</li>
+            </ol>
+
+            <h3 style="margin-top: 2em;">Opción 2: ZIP</h3>
+            <ol style="margin-left: 1.5em; line-height: 2;">
+                <li>Abre una terminal en tu proyecto</li>
+                <li>Elimina la carpeta <code>venv</code> (los evaluadores crearán la suya)</li>
+                <li>Comprime todo en <code>flask-game-api.zip</code></li>
+                <li>Envía el ZIP</li>
+            </ol>
+
+            <div class="warning" style="margin-top: 1.5em;">
+                <strong>⚠️ IMPORTANTE:</strong> No incluyas la carpeta <code>venv</code> en la entrega. Es muy pesada y cada máquina crea la suya.
+                Solo incluye: app.py, juegos.json, requirements.txt, README.md, y .gitignore
+            </div>
+        </section>
+
+        <!-- === COMPLETION BUTTON === -->
+        <div style="text-align: center; margin-top: 3em;">
+            <button
+                id="btn-complete"
+                class="btn-complete-class"
+                onclick="completeClassAndAward()"
+            >
+                🎯 MARCAR COMO COMPLETADO
+            </button>
+            <p style="margin-top: 1em; font-size: 0.95em; color: var(--text-muted);">
+                Haz clic cuando hayas entregado tu proyecto. Se registrará tu progreso y obtendrás 50 XP.
+            </p>
+        </div>
+
+        <!-- === NAVIGATION === -->
+        <div class="clase-nav-bottom">
+            <a href="./clase-09.html">← Clase 09</a>
+            <a href="../index.html">🏠 Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/progress.js"></script>
+    <script>
+        // Expandir/contraer bloques de código
+        document.querySelectorAll('.code-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const expandable = this.closest('.code-expandable');
+                expandable.classList.toggle('expanded');
+            });
+        });
+
+        // Completar clase y otorgar XP
+        function completeClassAndAward() {
+            const btn = document.getElementById('btn-complete');
+
+            // Llamar al sistema de progreso
+            const state = CourseProgress.completeClass('m1-c10');
+
+            // Actualizar botón
+            btn.textContent = '✅ ¡COMPLETADO! +50 XP';
+            btn.classList.add('completed');
+            btn.disabled = true;
+
+            // Mostrar notificación
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+                color: white;
+                padding: 1.5em 2em;
+                border-radius: 50px;
+                font-weight: 700;
+                font-size: 1.1em;
+                box-shadow: 0 0 30px rgba(57, 255, 20, 0.4);
+                z-index: 9999;
+                animation: slideIn 0.5s ease-out forwards;
+            `;
+            notification.innerHTML = '🎉 ¡BOSS BATTLE COMPLETADO! +50 XP 🎯';
+
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(400px); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(notification);
+
+            // Remover notificación después de 5 segundos
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.5s ease-out reverse forwards';
+                setTimeout(() => notification.remove(), 500);
+            }, 5000);
+
+            console.log('Boss Battle completado. XP actual:', state.xp);
+        }
+
+        // Verificar si ya está completado
+        window.addEventListener('load', () => {
+            const isCompleted = CourseProgress.isClassCompleted('m1-c10');
+            if (isCompleted) {
+                const btn = document.getElementById('btn-complete');
+                btn.textContent = '✅ YA COMPLETADO';
+                btn.classList.add('completed');
+                btn.disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>

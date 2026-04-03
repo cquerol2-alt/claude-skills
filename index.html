@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA para Desarrolladores Web - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard-page">
+    <div class="container">
+        <!-- Course Header -->
+        <header class="course-header">
+            <div class="header-content">
+                <h1 class="course-title">IA para Desarrolladores Web</h1>
+                <p class="course-subtitle">Curso a medida para Juan Querol León — 10 semanas, 100 horas</p>
+            </div>
+        </header>
+
+        <!-- Dashboard Stats -->
+        <section class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-content">
+                    <div class="stat-label">XP Total</div>
+                    <div class="stat-value" id="stat-xp">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✓</div>
+                <div class="stat-content">
+                    <div class="stat-label">Clases Completadas</div>
+                    <div class="stat-value" id="stat-classes">0/50</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-content">
+                    <div class="stat-label">Racha Actual</div>
+                    <div class="stat-value" id="stat-streak">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-content">
+                    <div class="stat-label">Medallas Obtenidas</div>
+                    <div class="stat-value" id="stat-badges">0</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- XP Progress Bar -->
+        <section class="progress-section">
+            <h2 class="section-title">Progreso en XP</h2>
+            <div id="xp-bar" class="xp-progress-bar">
+                <!-- Rendered by CourseProgress.renderXPBar() -->
+            </div>
+            <div class="xp-info">
+                <span id="xp-current">0</span> / <span id="xp-max">500</span> XP
+            </div>
+        </section>
+
+        <!-- Streak Display -->
+        <section class="streak-section">
+            <h2 class="section-title">Tu Racha</h2>
+            <div id="streak-display" class="streak-display">
+                <!-- Rendered by CourseProgress.renderStreak() -->
+            </div>
+        </section>
+
+        <!-- Badges Section -->
+        <section class="badges-section">
+            <h2 class="section-title">Medallas Desbloqueadas</h2>
+            <div id="badges-container" class="badges-container">
+                <!-- Rendered by CourseProgress.renderBadges() -->
+            </div>
+        </section>
+
+        <!-- Modules Section -->
+        <section class="modules-section">
+            <h2 class="section-title">Módulos del Curso</h2>
+            <div class="modules-grid">
+                <!-- Module 1: Python para Devs Web -->
+                <div class="module-item module-available">
+                    <div class="module-header">
+                        <span class="module-number">01</span>
+                        <span class="status-badge status-available">Disponible</span>
+                    </div>
+                    <a href="modulo-01-python/" class="module-link">
+                        <h3 class="module-title">Python para Devs Web</h3>
+                        <div class="module-info">
+                            <span class="module-weeks">Semanas 1-2</span>
+                            <span class="module-classes">10 clases</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Module 2: Fundamentos de IA y LLMs -->
+                <div class="module-item module-locked">
+                    <div class="module-header">
+                        <span class="module-number">02</span>
+                        <span class="status-badge status-locked">Próximamente</span>
+                    </div>
+                    <div class="module-link disabled">
+                        <h3 class="module-title">Fundamentos de IA y LLMs</h3>
+                        <div class="module-info">
+                            <span class="module-weeks">Semana 3</span>
+                            <span class="module-classes">5 clases</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 3: APIs de IA — Tu Primer Chatbot -->
+                <div class="module-item module-locked">
+                    <div class="module-header">
+                        <span class="module-number">03</span>
+                        <span class="status-badge status-locked">Próximamente</span>
+                    </div>
+                    <div class="module-link disabled">
+                        <h3 class="module-title">APIs de IA — Tu Primer Chatbot</h3>
+                        <div class="module-info">
+                            <span class="module-weeks">Semana 4</span>
+                            <span class="module-classes">5 clases</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 4: AI Coding Tools -->
+                <div class="module-item module-locked">
+                    <div class="module-header">
+                        <span class="module-number">04</span>
+                        <span class="status-badge status-locked">Próximamente</span>
+                    </div>
+                    <div class="module-link disabled">
+                        <h3 class="module-title">AI Coding Tools</h3>
+                        <div class="module-info">
+                            <span class="module-weeks">Semana 5</span>
+                            <span class="module-classes">5 clases</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 5: RAG — IA con Tus Datos -->
+                <div class="module-item module-locked">
+                    <div class="module-header">
+                        <span class="module-number">05</span>
+                        <span class="status-badge status-locked">Próximamente</span>
+                    </div>
+                    <div class="module-link disabled">
+                        <h3 class="module-title">RAG — IA con Tus Datos</h3>
+                        <div class="module-info">
+                            <span class="module-weeks">Semanas 6-7</span>
+                            <span class="module-classes">10 clases</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 6: Agentes de IA -->
+                <div class="module-item module-locked">
+                    <div class="module-header">
+                        <span class="module-number">06</span>
+                        <span class="status-badge status-locked">Próximamente</span>
+                    </div>
+                    <div class="module-link disabled">
+                        <h3 class="module-title">Agentes de IA</h3>
+                        <div class="module-info">
+                            <span class="module-weeks">Semana 8</span>
+                            <span class="module-classes">5 clases</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 7: Full-Stack AI App -->
+                <div class="module-item module-locked">
+                    <div class="module-header">
+                        <span class="module-number">07</span>
+                        <span class="status-badge status-locked">Próximamente</span>
+                    </div>
+                    <div class="module-link disabled">
+                        <h3 class="module-title">Full-Stack AI App</h3>
+                        <div class="module-info">
+                            <span class="module-weeks">Semana 9</span>
+                            <span class="module-classes">5 clases</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 8: Portfolio, CV y Job-Ready -->
+                <div class="module-item module-locked">
+                    <div class="module-header">
+                        <span class="module-number">08</span>
+                        <span class="status-badge status-locked">Próximamente</span>
+                    </div>
+                    <div class="module-link disabled">
+                        <h3 class="module-title">Portfolio, CV y Job-Ready</h3>
+                        <div class="module-info">
+                            <span class="module-weeks">Semana 10</span>
+                            <span class="module-classes">5 clases</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="course-footer">
+            <div class="footer-content">
+                <p class="footer-text">IA para Desarrolladores Web • 10 semanas • 100 horas de aprendizaje intensivo</p>
+                <p class="footer-contact">Para consultas: <a href="mailto:cquerol@riceinaction.com">cquerol@riceinaction.com</a></p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/progress.js"></script>
+    <script>
+        // Initialize dashboard on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get current progress data
+            const progress = CourseProgress.getProgress();
+
+            // Update stat cards
+            document.getElementById('stat-xp').textContent = progress.xp;
+            document.getElementById('stat-classes').textContent = `${progress.classesCompleted}/50`;
+            document.getElementById('stat-badges').textContent = progress.badges.length;
+
+            // Render XP bar
+            const xpBarHtml = CourseProgress.renderXPBar(500);
+            document.getElementById('xp-bar').innerHTML = xpBarHtml;
+            document.getElementById('xp-current').textContent = progress.xp;
+
+            // Render streak
+            const streakHtml = CourseProgress.renderStreak();
+            document.getElementById('streak-display').innerHTML = streakHtml;
+            document.getElementById('stat-streak').textContent = progress.currentStreak;
+
+            // Render badges
+            const badgesHtml = CourseProgress.renderBadges();
+            document.getElementById('badges-container').innerHTML = badgesHtml;
+        });
+    </script>
+</body>
+</html>
